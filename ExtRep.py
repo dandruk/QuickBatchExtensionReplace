@@ -1,5 +1,5 @@
 #Title: Quick Batch Extension Replace
-#Description: Gives files new extensions in a directory
+#Description: alter extensions of all matching files within a directory
 #Author: dandruk (https://github.com/dandruk)
 
 import os
