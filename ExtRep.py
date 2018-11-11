@@ -2,21 +2,21 @@
 #Description: alter extensions of all matching files within a directory
 #Author: dandruk (https://github.com/dandruk)
 
-import os
-import shutil
-from tkinter import filedialog
-from tkinter import messagebox
-from tkinter import *
-import ntpath
-import xml.etree.ElementTree as etree
-from urllib.parse import unquote
+import PySimpleGUI as sg	#GUI
+import os		#for altering filenames
+import ntpath	#for getting directory path basename
 
-#opens dialog window for user to select directory
-def open_selection():
-	root = Tk()
-	root.withdraw() #hides tk root window
-	folder =  filedialog.askdirectory(initialdir = "/",title = "Select directory")
-	return (folder)
+#opens dialog window for input values
+def run_GUI():
+	layout = [
+		[sg.Text('Directory: ', size=(15, 1), auto_size_text=False, justification='right'), sg.InputText('/'), sg.FolderBrowse()],
+		[sg.Text('Enter old extension: ', auto_size_text=True, justification='right'), sg.InputText('')],
+		[sg.Text('Enter new extension: ', auto_size_text=True, justification='right'), sg.InputText('')],
+		[sg.Submit()]
+		]
+	event, values = sg.Window('Select Directory', auto_size_text=True, default_element_size=(40, 1)).Layout(layout).Read()
+	
+	return values #return first input, which is the selected directory
 
 #replaces the extensions in the given directory
 def replace_in(path, old, new):
@@ -26,15 +26,17 @@ def replace_in(path, old, new):
 			split_old = file.split(old)
 			new_filename = split_old[0] + new
 			os.rename(file, new_filename)
+			
+			sg.Popup("In directory " + ntpath.basename(selectPath) + ": ", old + " replaced with " + new)	
+		else:
+			sg.Popup("Extension replacement could not be completed.")
 
 #PROGRAM START
 
-selectPath = open_selection() #select path to directory
-selectDir = ntpath.basename(selectPath) #directory name
+values = run_GUI()
 
-old_ext = input("Enter old extension:")
-new_ext = input("Enter new extension:")
+selectPath = values[0]
+old_ext = values[1]
+new_ext = values[2]
 
 replace_in(selectPath, old_ext, new_ext)
-
-messagebox.showinfo("Replacement in " + selectDir + ": ", old_ext + " replaced with " + new_ext)
